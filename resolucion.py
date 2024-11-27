@@ -3,7 +3,7 @@ import uvicorn
 import requests
 import os
 import pandas as pd
-
+import json
 
 #---------------------------------------------------------------------------
 #------------- ETAPA N° 01: Elección y consulta de los datos ---------------
@@ -31,13 +31,15 @@ else:
     except requests.exceptions.RequestException as e:
         print(f"Error al descargar el archivo: {e}")
 
-datos = pd.read_json("books.json")
+with open(filename, "r", encoding="utf-8") as file:
+    datos = json.load(file)
+
 #---------------------------------------------------------------------------
 #------------- ETAPA N° 02: Desarrollo del servidor API --------------------
 #---------------------------------------------------------------------------
 
 def menu():
-    print("Menú: \n")
+    print("\nMenú: ")
     print("1. Buscar libro por título.")
     print("2. Buscar libro por autor.")
     print("3. Agregar un libro.")
@@ -71,7 +73,7 @@ def opcion_1():
 
 def opcion_2():
     print("\n Usted ha seleccionado la opción 2.")
-    autor = "Chinua Achebe"
+    autor = input("Ingrese el nombre del autor: ")
     lista = []
 
     for dato in datos:
@@ -80,9 +82,10 @@ def opcion_2():
                 lista.append(dato["title"])
         
     if (len(lista) == 0):
-        print("No se encontraron coincidencias.")
+        print("\nNo se encontraron coincidencias.")
     else:
-        print(f"¡Se encontraron", len(lista), "coincidencia/s!")
+        print(f"\n¡Se encontraron", len(lista), "coincidencia/s!")
+        print("Libro/s encontrado/s: ")
         for titulos in lista:
             print(titulos)
 
@@ -112,14 +115,12 @@ def verificar_datos(rta):
 
     return 
 
-#---------------------------------------------------------------------------
+
 
 print("Iniciando ejecución. . .")
 salida = 0
 while(salida != 1):
     salida = menu()
-
-
 
 
 #---------------------------------------------------------------------------
@@ -134,33 +135,4 @@ while(salida != 1):
 # "title": "Things Fall Apart",
 # "year": 1958
 #}
-
-libros = 0
-autores = []
-
-for dato in datos:
-    libros +=1
-    if dato["author"] not in autores:
-        autores.append(dato["author"])
-
-print("Cantidad de libros: ", libros)
-print("Cantidad de autores únicos:", len(autores))
-
-
-
-print("\n Usted ha seleccionado la opción 2.")
-autor = input("Ingrese el nombre del autor: ")
-lista = []
-
-for dato in datos:
-    if (dato["author"] == autor):
-        if (dato["title"] not in lista):
-            lista.append(dato["title"])
-    
-if (len(lista) == 0):
-    print("No se encontraron coincidencias.")
-else:
-    print(f"¡Se encontraron", len(lista), "coincidencia/s!")
-    for titulos in lista:
-        print(titulos)
     
