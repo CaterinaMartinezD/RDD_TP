@@ -1,18 +1,19 @@
 import requests
 
 def menu():
-    print("\nMenú: \n")
+    print("\nMenú: ")
     print("1. Buscar libro por título.")
     print("2. Buscar libro por autor.")
     print("3. Agregar un libro.")
-    print("4. Eliminar un libro por titulo.")
-    print("5. Ver todos los libros.")
-    print("6. salir.")
+    print("4. Eliminar un libro por título.")
+    print("5. Eliminar un libro por autor.")
+    print("6. Ver todos los libros.")
+    print("7. salir.")
     
-    rta = 7
-    while rta <= 0 or rta > 6:
+    rta = 8
+    while rta <= 0 or rta > 7:
         rta = int(input("\n Seleccione una opción: "))
-        if rta <= 0 or rta > 6:
+        if rta <= 0 or rta > 7:
             print("Error. Ingresar un valor valido")     
 
     if (rta == 1):
@@ -28,11 +29,13 @@ def menu():
         delete_book_by_title()
         return
     elif (rta == 5):
-        get_books()
+        delete_book_by_author()
         return
     elif (rta == 6):
+        get_books()
+        return
+    elif (rta == 7):
         return 1
-
 
 def search_book_by_title():
     title = input("Ingrese el titulo a buscar: ")
@@ -71,8 +74,13 @@ def append_book():
 
 def delete_book_by_title():
     title = input("Ingrese el titulo: ")
-    response = requests.delete(f"http://127.0.0.1:8000/books?title={title}")
-        #f"http://127.0.0.1:8000/books?title={title}")
+    response = requests.delete(f"http://127.0.0.1:8000/books/by-title?title={title}")
+    datos = response.json()
+    print(datos)
+
+def delete_book_by_author():
+    author = input("Ingrese el autor: ")
+    response = requests.delete(f"http://127.0.0.1:8000/books/by-author?author={author}")
     datos = response.json()
     print(datos)
 

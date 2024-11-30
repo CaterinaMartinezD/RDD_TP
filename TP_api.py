@@ -63,8 +63,9 @@ class Book(BaseModel):
 # Función para visualizar el menú
 @app.get("/")
 def menu():
-    return { "Menú" : [{"N° 01. Listado de libros" : "/books"},{"N° 02. Buscar libro por título" : "/books/title/NOMBRE_LIBRO"}, {"N° 03. Buscar libro por autor" : "/books/author/NOMBRE_AUTOR"}, 
-                        {"N° 04. Agregar un libro" : "COMPLETAR"}, {"N° 05. Eliminar un libro" : "/books/delete/NOMBR_TITULO"}]}
+    return { "Menú" : [{"N° 01. Buscar libro por título" : "/books/title/NOMBRE_LIBRO"}, {"N° 02. Buscar libro por autor" : "/books/author/NOMBRE_AUTOR"}, 
+                        {"N° 03. Agregar un libro por titulo" : "COMPLETAR"}, {"N° 04. Eliminar un libro" : "/books"},
+                        {"N° 05. Eliminar un libro por autor" : "/books"}, {"N° 06. Listado de libros" : "/books"}]}
 
 # http://127.0.0.1:8000/
 
@@ -128,7 +129,7 @@ def agregar_libro(libro: dict):
 
 
 # Función para eliminar un libro por su titulo
-@app.delete("/books")
+@app.delete("/books/by-title")
 def eliminar_libro_titulo(title):
     datos = get_books()   # Recupera los libros
 
@@ -142,30 +143,21 @@ def eliminar_libro_titulo(title):
     save_books(datos)
     return {"message": f"El libro '{title}' no fue encontrado."}
 
+# http://127.0.0.1:8000/books/by-title
+
 # Función para eliminar un libro por el autor
-@app.delete("/books")
+@app.delete("/books/by-author")
 def eliminar_libro_autor(author):
     datos = get_books()   # Recupera los libros
-
+    
     # Itera los libros y  verifica si existe
     for libro in datos:
-        if libro["author"].lower() != author.lower():
-            raise HTTPException(status_code=400, detail=f"El autor '{author}' no fue encontrado.")
+        if libro["author"].lower() == author.lower():
+            datos.remove(libro)
+            save_books(datos)
+            return {"message": f"El autor '{author}' fue eliminado exitosamente."}
         
-    # Si existe, lo elimina
-    datos.remove(libro)
     save_books(datos)
+    return {"message": f"El autor '{author}' no fue encontrado."}
 
-    return {"message": f"El libro '{author}' fue eliminado exitosamente."}
-
-
-#{
-# "author": "Chinua Achebe",
-# "country": "Nigeria",
-# "imageLink": "images/things-fall-apart.jpg",
-# "language": "English",
-# "link": "https://en.wikipedia.org/wiki/Things_Fall_Apart\n",
-# "pages": 209,
-# "title": "Things Fall Apart",
-# "year": 1958
-#}}
+# http://127.0.0.1:8000/books/by-author
