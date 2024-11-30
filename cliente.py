@@ -5,7 +5,7 @@ import requests
 #------------------------------------------------------------------------------------------------
 
 #IP del servidor a utilizar
-server_ip = "192.168.0.120"
+server_ip = "127.0.0.1"
 
 def menu():
     print("\nMenú: ")
@@ -111,7 +111,7 @@ def delete_book_by_author():
     print(datos)
 
 def get_books():
-    response = requests.get("http://{server_ip}:8000/books")
+    response = requests.get(f"http://{server_ip}:8000/books")
     if response.status_code == 404:
         print(f"Error: {response.json()['detail']}")
         return

@@ -1,5 +1,4 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 import requests
 import os
 import json
@@ -48,19 +47,6 @@ def get_books():
 def save_books(data):
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(data, file, indent=4)
-
-# Modelo para validar los datos de un libro
-'''
-class Book(BaseModel):
-    author: str
-    country: str
-    imageLink: str
-    language: str
-    link: str
-    pages: int
-    title: str
-    year: int
-'''
 
 ################################################################
 # Función para visualizar el menú
@@ -147,20 +133,23 @@ def eliminar_libro_titulo(title):
     return {"message": f"El libro '{title}' no fue encontrado."}
 
 ################################################################
-# DELETE: Eliminar un libro por el autor
+# DELETE: Eliminar libros por autor
 @app.delete("/books/by-author")
-def eliminar_libro_autor(author):
-    datos = get_books()   # Recupera los libros
+def eliminar_libros_por_autor(author: str):
+    datos = get_books()  # Recupera los libros
     
-    # Itera los libros y  verifica si existe
-    for libro in datos:
-        if libro["author"].lower() == author.lower():
-            datos.remove(libro)
-            save_books(datos)
-            return {"message": f"El autor '{author}' fue eliminado exitosamente."}
-        
-    save_books(datos)
-    return {"message": f"El autor '{author}' no fue encontrado."}
+    # Filtra los libros que NO coincidan con el autor
+    libros_filtrados = [libro for libro in datos if libro["author"].lower() != author.lower()]
+
+    # Verifica si se eliminaron libros
+    if len(libros_filtrados) == len(datos):
+        # No se encontró ningún libro con el autor especificado
+        return {"message": f"No se encontraron libros del autor '{author}'."}
+
+    # Actualiza el archivo JSON con los libros restantes
+    save_books(libros_filtrados)
+    eliminados = len(datos) - len(libros_filtrados)
+    return {"message": f"Se eliminaron {eliminados} libro(s) del autor '{author}' exitosamente."}
 
 ################################################################
 # PUT: Actualizar un libro buscando por el título
