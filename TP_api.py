@@ -50,6 +50,7 @@ def save_books(data):
         json.dump(data, file, indent=4)
 
 # Modelo para validar los datos de un libro
+'''
 class Book(BaseModel):
     author: str
     country: str
@@ -59,7 +60,8 @@ class Book(BaseModel):
     pages: int
     title: str
     year: int
-
+'''
+################################################################
 # Función para visualizar el menú
 @app.get("/")
 def menu():
@@ -69,6 +71,7 @@ def menu():
 
 # http://127.0.0.1:8000/
 
+################################################################
 # Función para ver listado de libros
 @app.get("/books")
 def leer_archivo():
@@ -77,7 +80,9 @@ def leer_archivo():
 
 # http://127.0.0.1:8000/books
 
+################################################################
 # Función para buscar un libro por su titulo
+'''
 @app.get("/books/title/{title}")
 def buscar_titulo(title):
     datos = get_books()
@@ -90,10 +95,27 @@ def buscar_titulo(title):
         raise HTTPException(status_code=404, detail="No se encontraron coincidencias")
 
     return f"Se encontraron {len(libros)} coincidencia/s!", libros
+'''
+# metodo nuevo
+@app.get("/books/title/{title}")
+def buscar_titulo(title: str):
+    datos = get_books()
+    libros = [libro for libro in datos if libro["title"].lower() == title.lower()]
 
+    if not libros:
+        raise HTTPException(status_code=404, detail="No se encontraron coincidencias")
+
+    # Si solo hay un libro, devuelve ese directamente
+    if len(libros) == 1:
+        return libros[0]
+
+    # Si hay más de un libro (casos raros), devuelve todos
+    return libros
 # http://127.0.0.1:8000/books/title/Things%20Fall%20Apart
 
+################################################################
 # Función para buscar un libro por el autor
+'''
 @app.get("/books/author/{author}")
 def buscar_autor(author):
     datos = get_books()
@@ -106,15 +128,31 @@ def buscar_autor(author):
         raise HTTPException(status_code=404, detail="No se encontraron coincidencias")
 
     return f"Se encontraron {len(libros)} coincidencia/s!", libros
+'''
+# metodo nuevo
+@app.get("/books/author/{author}")
+def buscar_autor(author: str):
+    datos = get_books()
 
+    # Filtrar libros por autor (ignorando mayúsculas/minúsculas)
+    libros = [libro for libro in datos if libro["author"].lower() == author.lower()]
+
+    # Si no se encuentra ningún libro, lanzar excepción
+    if not libros:
+        raise HTTPException(status_code=404, detail="No se encontraron libros para el autor especificado.")
+
+    # Si se encuentra un único libro, devolverlo directamente
+    if len(libros) == 1:
+        return libros[0]
+
+    # Si hay múltiples libros, devolver la lista completa
+    return libros
 # http://127.0.0.1:8000/books/author/Chinua%20Achebe
 
+################################################################
 # POST: Agregar un nuevo libro
 @app.post("/books")
 def agregar_libro(libro: dict):
-    # pasar de dict a Book
-    # libro = Book(libro.values())
-
     # Recupera los libros
     datos = get_books()
     
@@ -127,8 +165,8 @@ def agregar_libro(libro: dict):
     save_books(datos)
     return {"message": f"Libro '{libro["title"]}' agregado exitosamente."}
 
-
-# Función para eliminar un libro por su titulo
+################################################################
+# DELETE: Eliminar un libro por su titulo
 @app.delete("/books/by-title")
 def eliminar_libro_titulo(title):
     datos = get_books()   # Recupera los libros
@@ -145,7 +183,8 @@ def eliminar_libro_titulo(title):
 
 # http://127.0.0.1:8000/books/by-title
 
-# Función para eliminar un libro por el autor
+################################################################
+# DELETE: Eliminar un libro por el autor
 @app.delete("/books/by-author")
 def eliminar_libro_autor(author):
     datos = get_books()   # Recupera los libros
@@ -161,3 +200,18 @@ def eliminar_libro_autor(author):
     return {"message": f"El autor '{author}' no fue encontrado."}
 
 # http://127.0.0.1:8000/books/by-author
+
+################################################################
+# PUT: Actualizar un libro buscando por el título
+@app.put("/books/{title}")
+def update_book(title: str, libro: dict):
+    libros = get_books()
+
+    for index, existing_book in enumerate(libros):
+        if existing_book["title"] == title:
+            libros[index] = libro
+            save_books(libros)
+            return {"message": f"Libro '{title}' actualizado exitosamente."}
+    raise HTTPException(status_code=404, detail=f"El libro '{title}' no se encontró.")
+
+################################################################
