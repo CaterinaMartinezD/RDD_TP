@@ -61,6 +61,7 @@ class Book(BaseModel):
     title: str
     year: int
 '''
+
 ################################################################
 # Función para visualizar el menú
 @app.get("/")
@@ -69,8 +70,6 @@ def menu():
                         {"N° 03. Agregar un libro por titulo" : "COMPLETAR"}, {"N° 04. Eliminar un libro" : "/books"},
                         {"N° 05. Eliminar un libro por autor" : "/books"}, {"N° 06. Listado de libros" : "/books"}]}
 
-# http://127.0.0.1:8000/
-
 ################################################################
 # Función para ver listado de libros
 @app.get("/books")
@@ -78,25 +77,8 @@ def leer_archivo():
     datos = get_books()
     return {"books": datos}
 
-# http://127.0.0.1:8000/books
-
 ################################################################
-# Función para buscar un libro por su titulo
-'''
-@app.get("/books/title/{title}")
-def buscar_titulo(title):
-    datos = get_books()
-    libros = []
-    for libro in datos:
-        if(libro["title"].lower() == title.lower()):
-            libros.append(libro) 
-
-    if not libros:
-        raise HTTPException(status_code=404, detail="No se encontraron coincidencias")
-
-    return f"Se encontraron {len(libros)} coincidencia/s!", libros
-'''
-# metodo nuevo
+# GET: Busca un libro por título
 @app.get("/books/title/{title}")
 def buscar_titulo(title: str):
     datos = get_books()
@@ -111,25 +93,9 @@ def buscar_titulo(title: str):
 
     # Si hay más de un libro (casos raros), devuelve todos
     return libros
-# http://127.0.0.1:8000/books/title/Things%20Fall%20Apart
 
 ################################################################
-# Función para buscar un libro por el autor
-'''
-@app.get("/books/author/{author}")
-def buscar_autor(author):
-    datos = get_books()
-    libros = []
-    for libro in datos:
-        if(libro["author"].lower() == author.lower()):
-            libros.append(libro) 
-
-    if not libros:
-        raise HTTPException(status_code=404, detail="No se encontraron coincidencias")
-
-    return f"Se encontraron {len(libros)} coincidencia/s!", libros
-'''
-# metodo nuevo
+# GET: Busca un libro por autor
 @app.get("/books/author/{author}")
 def buscar_autor(author: str):
     datos = get_books()
@@ -147,7 +113,6 @@ def buscar_autor(author: str):
 
     # Si hay múltiples libros, devolver la lista completa
     return libros
-# http://127.0.0.1:8000/books/author/Chinua%20Achebe
 
 ################################################################
 # POST: Agregar un nuevo libro
@@ -181,8 +146,6 @@ def eliminar_libro_titulo(title):
     save_books(datos)
     return {"message": f"El libro '{title}' no fue encontrado."}
 
-# http://127.0.0.1:8000/books/by-title
-
 ################################################################
 # DELETE: Eliminar un libro por el autor
 @app.delete("/books/by-author")
@@ -198,8 +161,6 @@ def eliminar_libro_autor(author):
         
     save_books(datos)
     return {"message": f"El autor '{author}' no fue encontrado."}
-
-# http://127.0.0.1:8000/books/by-author
 
 ################################################################
 # PUT: Actualizar un libro buscando por el título

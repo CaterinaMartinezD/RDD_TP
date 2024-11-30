@@ -1,5 +1,12 @@
 import requests
 
+#------------------------------------------------------------------------------------------------
+#------------- Etapa 3: Desarrollar el cliente API ----------------------------------------------
+#------------------------------------------------------------------------------------------------
+
+#IP del servidor a utilizar
+server_ip = "192.168.0.120"
+
 def menu():
     print("\nMenú: ")
     print("1. Buscar libro por título.")
@@ -43,7 +50,7 @@ def menu():
 
 def search_book_by_title():
     title = input("Ingrese el titulo a buscar: ")
-    response = requests.get(f"http://127.0.0.1:8000/books/title/{title}")
+    response = requests.get(f"http://{server_ip}:8000/books/title/{title}")
     if response.status_code == 404:
         print(f"Error: {response.json()['detail']}")
         return
@@ -52,7 +59,7 @@ def search_book_by_title():
 
 def search_book_by_author():
     author = input("Ingrese el titulo a buscar: ")
-    response = requests.get(f"http://127.0.0.1:8000/books/author/{author}")
+    response = requests.get(f"http://{server_ip}:8000/books/author/{author}")
     if response.status_code == 404:
         print(f"Error: {response.json()['detail']}")
         return
@@ -78,7 +85,7 @@ def append_book():
              'year': year 
             }
 
-    response = requests.post("http://127.0.0.1:8000/books", json = libro)
+    response = requests.post(f"http://{server_ip}:8000/books", json = libro)
     if response.status_code == 404:
         print(f"Error: {response.json()['detail']}")
         return
@@ -87,7 +94,7 @@ def append_book():
 
 def delete_book_by_title():
     title = input("Ingrese el titulo: ")
-    response = requests.delete(f"http://127.0.0.1:8000/books/by-title?title={title}")
+    response = requests.delete(f"http://{server_ip}:8000/books/by-title?title={title}")
     if response.status_code == 404:
         print(f"Error: {response.json()['detail']}")
         return
@@ -96,7 +103,7 @@ def delete_book_by_title():
 
 def delete_book_by_author():
     author = input("Ingrese el autor: ")
-    response = requests.delete(f"http://127.0.0.1:8000/books/by-author?author={author}")
+    response = requests.delete(f"http://{server_ip}:8000/books/by-author?author={author}")
     if response.status_code == 404:
         print(f"Error: {response.json()['detail']}")
         return
@@ -104,7 +111,7 @@ def delete_book_by_author():
     print(datos)
 
 def get_books():
-    response = requests.get("http://127.0.0.1:8000/books")
+    response = requests.get("http://{server_ip}:8000/books")
     if response.status_code == 404:
         print(f"Error: {response.json()['detail']}")
         return
@@ -113,7 +120,7 @@ def get_books():
 
 def update_book():
     title = input("Ingrese el título del libro que desea actualizar: ")
-    response = requests.get(f"http://127.0.0.1:8000/books/title/{title}")
+    response = requests.get(f"http://{server_ip}:8000/books/title/{title}")
     if response.status_code == 404:
         print(f"Error: {response.json()['detail']}")
         return
@@ -148,7 +155,7 @@ def update_book():
     book[field] = new_value
 
     # Realiza la solicitud PUT al servidor
-    response = requests.put(f"http://127.0.0.1:8000/books/{title}", json=book)
+    response = requests.put(f"http://{server_ip}:8000/books/{title}", json=book)
     
     if response.status_code == 200:
         print(response.json()["message"])
